@@ -1,0 +1,210 @@
+//==============================================================================
+// 函数: f_BigMoneytosmall()
+//------------------------------------------------------------------------------
+// 描述: 返回大写金额  ---转小写
+//------------------------------------------------------------------------------
+// 参数:
+//        value    string    adec_money        待转换为小写的金额
+//------------------------------------------------------------------------------
+// 返回值: decimal 
+//------------------------------------------------------------------------------
+// 作者:   zh      日期: 20170726
+//------------------------------------------------------------------------------
+// 修改历史:
+//    
+//==============================================================================
+ 
+
+//String ls_num[]  = {"零","壹","贰","叁","肆","伍","陆","柒","捌","玖"} ;
+int ls_num[]={0,1,2,3,4,5,6,7,8,9};
+ 
+String ls_dec,ls_char ;
+Integer li_index,li_num ;
+Decimal{2}  ls_return,ls_je,ls_qsz;
+
+string ls_bl//倍率
+
+int ls_sg,ls_bg,ls_qg,ls_wg,ls_yg;//拾' '佰' '仟 '万'     ='分' or  ls_dx='角' r   or  ls_dx='亿'   then
+
+string ldec_arg,ldec_xs,ls_unit,ls_dx
+ 
+ldec_arg = trim(adec_money);
+
+
+if left(ldec_arg,1)='￥' then//20210725
+	ldec_arg=right(ldec_arg,len(ldec_arg) -1)
+end if
+
+ls_return=dec(ldec_arg)//假设是数字   20210725
+ 
+IF IsNull(ldec_arg) OR trim(ldec_arg) ='' THEN RETURN ls_num[1] ;
+ 
+ 
+IF ldec_arg= "整" or ldec_arg="零" or ldec_arg="零元"THEN 
+	ls_return =0;
+end if
+
+ls_dec=ldec_arg
+
+
+if len(ls_dec)>15 then  
+	messagebox("","只能到万亿")
+//	return 0
+end if
+ 
+ls_je=0
+ls_qsz=0
+ls_bl=''
+ ls_sg=0
+ ls_bg=0
+ ls_qg=0
+ ls_wg=0
+ ls_yg=0
+ls_dec=reverse(ls_dec)
+//messagebox('1',ls_dec)
+FOR li_index = 1 TO Len(ls_dec)
+ 
+	//ls_dx=mid(ls_dec,ls_ks,ls_js)
+	ls_unit=mid(ls_dec,li_index,1)
+	ls_dx=ls_unit
+	choose case ls_unit
+			case"零"
+			ls_unit="0"
+			case"壹"
+			ls_unit="1"
+			case"贰"
+			ls_unit="2"
+			case"叁"
+			ls_unit="3"
+			case"肆"
+			ls_unit="4"
+			case"伍"
+			ls_unit="5"
+			case"陆"
+			ls_unit="6"
+			case"柒"
+			ls_unit="7"
+			case"捌"
+			ls_unit="8"
+			case"玖"
+			ls_unit="9"
+	end choose
+	
+	
+	if  ls_dx='拾' then
+		ls_sg=ls_sg +1
+	end if
+	if  ls_dx='佰' then
+		ls_bg=ls_bg +1
+		
+	end if
+	if ls_dx='仟' then
+		ls_qg=ls_qg +1
+	end if
+	
+	if ls_dx='万' then
+		ls_wg=ls_wg +1
+	end if
+	
+	if ls_dx='亿' then
+		ls_yg=ls_yg +1
+	end if
+	
+ 
+	choose case ls_unit
+			case"分" 
+			ls_bl="0.01"//ls_bl 倍率
+			
+		    case "角"
+			ls_bl="0.1"
+			case"元"
+			ls_bl="1"
+			
+			case"拾"
+			if ls_sg=1 then
+				 ls_bl="10"
+			end if
+			if ls_sg=2 or ls_wg=1 then
+				 ls_bl="100000"
+			end if
+			
+			if ls_sg=3 or ls_yg=1 then
+				 ls_bl="1000000000"
+			end if
+			
+			case"佰"
+			if ls_bg=1 then
+				ls_bl="100"
+			end if
+			if ls_bg=2  or ls_wg=1 then
+				ls_bl="1000000"
+			end if
+			
+			if ls_bg=3  or ls_yg=1 then
+				ls_bl="10000000000"
+			end if
+			
+			case"仟"
+			if ls_qg=1 then
+				ls_bl="1000"
+			end if
+			if ls_qg=2 or ls_wg=1 then
+				ls_bl="10000000"
+			end if
+			
+			if ls_qg=3   or ls_yg=1 then
+				ls_bl="100000000000"
+			end if
+				
+				
+			case"万"
+			if ls_wg=1 then
+				ls_bl="10000"
+			end if
+			
+			if ls_wg=2   or ls_yg=1 then
+				ls_bl="1000000000000"
+			end if
+			
+			case"亿"
+			ls_bl="100000000"
+ 
+	end choose
+	
+// 
+	//if ls_dx='分' or  ls_dx='角' or  ls_dx='元' or  ls_dx='拾' or  ls_dx='佰' or  ls_dx='仟' or  ls_dx='万' or  ls_dx='亿'   then
+	if ls_dx='分' or  ls_dx='角' or ls_dx='拾' or  ls_dx='佰' or  ls_dx='仟' or  ls_dx='万' or  ls_dx='亿'   then
+		
+		
+		
+		
+	//	messagebox("单位",string(ls_qsz) +'---' +ls_dx +'----金额:' +string(ls_je))
+	end if
+	
+	
+	if ls_dx='零' or  ls_dx='壹' or  ls_dx='贰' or  ls_dx='叁' or  ls_dx='肆' or  ls_dx='伍' or  ls_dx='陆' or  ls_dx='柒' or  ls_dx='捌' or  ls_dx='玖' then
+	//	ls_je=ls_je +dec(ls_unit)
+		
+		//messagebox('ls_je',string(ls_je))
+		
+		
+		ls_qsz=dec(ls_unit)//前一个数
+		//messagebox("数字",string(ls_qsz) +'---倍率：' +string(ls_unit))
+		
+		ls_qsz=ls_qsz *  dec(ls_bl)
+		
+		
+		ls_je=ls_je +ls_qsz
+	
+		
+		//messagebox("值",string(ls_qsz) +'---' +ls_dx +'----金额:' +string(ls_je))
+	end if
+	
+  
+next
+
+ls_return=ls_je
+
+
+//返回所转换得到的金额
+RETURN ls_return ;
